@@ -1,0 +1,95 @@
+import numpy as np
+import cv2
+import matplotlib.pyplot as plt
+import math
+import os
+
+def menu():
+    
+    os.system('cls') 
+    print ("Bienvenido, a continuación seleccione una opción: ")
+    print ("\t1 - NEGATIVO")
+    print ("\t2 - BRILLO")
+    print ("\t3 - CONTRASTE LOGARÍTMICO")
+    print ("\t9 - SALIR")
+ 
+ 
+while True:
+    # Mostramos el menu
+    menu()
+    # solicituamos una opción al usuario
+    opcionMenu = input("inserta un numero valor >> ")
+ 
+    if opcionMenu=="1":
+        print ("Has seleccionado NEGATIVO")
+        I=cv2.imread('rx2.jpeg',0)   
+        A=I.shape
+        I2=I>100; #Opción 2
+        I3=np.double(I)*2;
+        for i in range(0,A[0],1):
+            for j in range(0,A[1],1):
+                if (I3[i,j]>255):
+                    I3[i,j]=255;
+                    
+        I2=np.uint8(I2)
+        I3=np.uint8(I3)
+        print("")
+        #plt.figure("NEGATIVO VS ORIGINAL")
+        plt.subplot(121)
+        plt.imshow(I,'gray')
+        plt.title("Original")
+        plt.subplot(122)
+        plt.imshow(255-I3,'gray')
+        plt.title("NEGATIVO")
+        plt.show()
+        
+        input("Has pulsado la opción 1...\npulsa una tecla para continuar")
+    elif opcionMenu=="2":
+        print ("Has seleccionado BRILLO")
+        I=cv2.imread('rx2.jpeg',0)
+        A=I.shape
+        I2=I>100; #Opción 2
+        I3=np.double(I)*2;
+        for i in range(0,A[0],1):
+            for j in range(0,A[1],1):
+                if (I3[i,j]>255):
+                    I3[i,j]=255;
+                    
+        I2=np.uint8(I2)
+        I3=np.uint8(I3)
+        print("")
+        plt.subplot(121)
+        plt.imshow(I,'gray')
+        plt.title("Original")
+        plt.subplot(122)
+        plt.imshow(I3,'gray')
+        plt.title("BRILLO")
+        plt.show()
+        input("Has pulsado la opción 2...\npulsa una tecla para continuar")
+        
+    elif opcionMenu=="3":
+        print ("Has seleccionado CONTRASTE LOGARÍTMICO")
+        I= cv2.imread('rx2.jpeg',0)
+        A=I.shape
+        I2=I>87;#sin necesidad de for, pero hasta ahora no esta puro
+        #I3=np.uint8(I2)*I#segmentar
+        I3=99*np.log10((35+np.double(I)))#negativo
+        for i in range(0,A[0],1):
+            for j in range(0,A[1],1):
+                if (I3[i,j]>255):
+                    I3[i,j]=255;
+        print("")           
+        plt.subplot(121)
+        plt.imshow(I,'gray')
+        plt.title("Original")
+        plt.subplot(122)
+        plt.imshow(np.uint8(I3),'gray')
+        plt.title("Log.")
+        plt.show()
+        input("Has pulsado la opción 3...\npulsa una tecla para continuar")
+        
+    elif opcionMenu=="9":
+        break
+    else:
+        print ("SALIR")
+        input("No has pulsado ninguna opción correcta...\npulsa una tecla p
