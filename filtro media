@@ -1,0 +1,85 @@
+import cv2
+import matplotlib.pyplot as plt
+import numpy as np
+
+I=cv2.imread('CANCERCZ.jpg',0)
+[FIL,COL]=I.shape
+print(I.shape)
+NU=np.uint8(np.zeros((FIL,COL)))#nueva
+N1=np.uint8(np.zeros((FIL,COL)))
+NN=np.uint8(np.zeros((FIL,COL)))
+
+#M FILtro de media
+M=np.array(([[0.111,0.111,0.111],
+             [0.111,0.111,0.111],
+             [0.111,0.111,0.111]]))
+
+mas = np.zeros((FIL+2,COL+2))
+final = np.array(np.zeros((FIL+2,COL+2)))
+mas [1:FIL:1,1:COL:1] = I[0:FIL-1,0:COL-1]
+ML= mas.shape
+#Convolucion : se pone 3 veces el FILtro para que se vea mejor     
+for i in range(1,FIL-1,1):
+    for j in range (1,COL-1,1):
+        NU[i,j]=mas[i-1,j-1]*M[0,0]+mas[i-1,j]*M[0,1]+mas[i-1,j+1]*M[0,2]+mas[i,j-1]*M[1,0]+mas[i,j]*M[1,1]+mas[i,j+1]*M[1,2]+mas[i+1,j-1]*M[2,0]+mas[i+1,j]*M[2,1]+mas[i+1,j+1]*M[2,2];
+for i in range(1,FIL-1,1):
+    for j in range (1,COL-1,1):
+        N1[i,j]=NU[i-1,j-1]*M[0,0]+NU[i-1,j]*M[0,1]+NU[i-1,j+1]*M[0,2]+NU[i,j-1]*M[1,0]+NU[i,j]*M[1,1]+NU[i,j+1]*M[1,2]+NU[i+1,j-1]*M[2,0]+NU[i+1,j]*M[2,1]+NU[i+1,j+1]*M[2,2];
+for i in range(1,FIL-1,1):
+    for j in range (1,COL-1,1):
+        NN[i,j]=N1[i-1,j-1]*M[0,0]+N1[i-1,j]*M[0,1]+N1[i-1,j+1]*M[0,2]+N1[i,j-1]*M[1,0]+N1[i,j]*M[1,1]+N1[i,j+1]*M[1,2]+N1[i+1,j-1]*M[2,0]+N1[i+1,j]*M[2,1]+N1[i+1,j+1]*M[2,2];
+
+MSK=np.array([[-1,-1,-1],[-1,8,-1],[-1,-1,-1]])#lapaceano negativo de 2 orden
+
+MSK1=np.array([[1,1,1],[1,-8,1],[1,1,1]])#lapalceano positivo de 2 orden
+#MSK = np.array([[-1,-1,-1],
+#               [-1,A+8,-1],
+#               [-1,-1,-1]])
+
+M1=np.zeros((FIL,COL))
+M2=np.array(np.zeros((FIL,COL)))
+
+
+#print("ya esta aqui")
+for i in range(1,FIL-1,1):
+    for j in range (1,COL-1,1):
+        M1[i,j]=NN[i-1,j-1]*MSK[0,0]+NN[i-1,j]*MSK[0,1]+NN[i-1,j+1]*MSK[0,2]+NN[i,j-1]*MSK[1,0]+NN[i,j]*MSK[1,1]+NN[i,j+1]*MSK[1,2]+NN[i+1,j-1]*MSK[2,0]+NN[i+1,j]*MSK[2,1]+NN[i+1,j+1]*MSK[2,2];
+
+#print("ya esta aquix2")
+for i in range(1,FIL-1,1):
+    for j in range (1,COL-1,1):
+        M2[i,j]=NN[i-1,j-1]*MSK1[0,0]+NN[i-1,j]*MSK1[0,1]+NN[i-1,j+1]*MSK1[0,2]+NN[i,j-1]*MSK1[1,0]+NN[i,j]*MSK1[1,1]+NN[i,j+1]*MSK1[1,2]+NN[i+1,j-1]*MSK1[2,0]+NN[i+1,j]*MSK1[2,1]+NN[i+1,j+1]*MSK1[2,2];
+
+RESULT=NN+M1
+RESULT2=NN+M2
+
+print("ya casi")
+
+plt.figure()
+plt.subplot(221)
+plt.imshow(I,'gray')
+plt.title('IMAGEN ORIGINAL')
+plt.subplot(222)
+plt.imshow(NN,'gray')
+plt.title('FILTRO DE MEDIA EN n=3')
+plt.subplot(223)
+plt.imshow(M1,'gray')
+plt.title('LAPLACIANO NEGATIVO')
+plt.subplot(224)
+plt.imshow(M2,'gray')
+plt.title('LAPLACEANO POSITIVO')
+
+plt.figure()
+plt.subplot(221)
+plt.imshow(I,'gray')
+plt.title('IMAGEN ORIGINAL')
+plt.subplot(222)
+plt.imshow(NN,'gray')
+plt.title('FILTRO DE MEDIA')
+plt.subplot(223)
+plt.imshow(M1+NN,'gray')
+plt.title('LAPLACIANO NEGATIVO')
+plt.subplot(224)
+plt.imshow(M2+NN,'gray')
+plt.title('LAPLACEANO POSITIVO')
+plt.show()
