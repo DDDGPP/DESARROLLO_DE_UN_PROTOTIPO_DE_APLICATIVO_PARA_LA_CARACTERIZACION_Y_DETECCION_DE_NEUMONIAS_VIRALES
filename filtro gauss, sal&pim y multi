@@ -1,0 +1,90 @@
+import numpy as np
+import cv2
+import matplotlib.pyplot as plt
+import math
+
+I = cv2.imread('RGAUSSs2.png',0)
+F,C = I.shape
+tama = (F,C)
+print (tama)
+#MEDIA RUIDO GAUSSIANO
+new = np.array (([[0.111,0.111,0.111],
+                  [0.111,0.111,0.111],
+                  [0.111,0.111,0.111]]))
+
+MI = np.zeros((F+2,C+2))
+final = np.array(np.zeros((F+2,C+2)))
+MI [1:F:1,1:C:1] = I[0:F-1,0:C-1]
+MN = MI.shape
+#print(MI)
+#print(MN)
+for i in range (1,MN[0]-1,1):
+    for j in range (1,MN[1]-1,1):
+        final [i,j] = (MI[i-1,j-1]*new[0,0]) + (MI[i-1,j]*new[0,1]) + (MI[i-1,j+1]*new[0,2]) + (MI[i,j-1]*new[1,0]) + (MI[i,j]*new[1,1]) + (MI[i,j+1]*new[1,2]) + (MI[i+1,j-1]*new[2,0]) + (MI[i+1,j]*new[2,1]) + (MI[i+1,j+1]*new[2,2])
+
+print (final)
+#MEDIA RUIDO MULTIPLICATIVO
+
+I2 = cv2.imread('RMUL2.png',0)
+F2,C2 = I2.shape
+tama2 = (F2,C2)
+print (tama2)
+new2 = np.array (([[0.111,0.111,0.111],
+                  [0.111,0.111,0.111],
+                  [0.111,0.111,0.111]]))
+
+MI2 = np.zeros((F2+2,C2+2))
+final2 = np.array(np.zeros((F2+2,C2+2)))
+MI2[1:F2:1,1:C2:1] = I2[0:F2-1,0:C2-1]
+MN2= MI2.shape
+
+for i in range (1,MN2[0]-1,1):
+    for j in range (1,MN2[1]-1,1):
+        final2 [i,j] = (MI2[i-1,j-1]*new2[0,0]) + (MI2[i-1,j]*new2[0,1]) + (MI2[i-1,j+1]*new2[0,2]) + (MI2[i,j-1]*new2[1,0]) + (MI2[i,j]*new2[1,1]) + (MI2[i,j+1]*new2[1,2]) + (MI2[i+1,j-1]*new2[2,0]) + (MI2[i+1,j]*new2[2,1]) + (MI2[i+1,j+1]*new2[2,2])
+
+print (final2)
+
+#MEDIA RUIDO SAL Y PIMIENTA
+I3= cv2.imread('RSYP2.png',0)
+F3,C3 = I3.shape
+tama3 = (F3,C3)
+print (tama3)
+new3= np.array (([[0.111,0.111,0.111],
+                  [0.111,0.111,0.111],
+                  [0.111,0.111,0.111]]))
+
+MI3 = np.zeros((F3+2,C3+2))
+final3 = np.array(np.zeros((F3+2,C3+2)))
+MI3[1:F3:1,1:C3:1] = I3[0:F3-1,0:C3-1]
+MN3 = MI3.shape
+
+for i in range (1,MN3[0]-1,1):
+    for j in range (1,MN3[1]-1,1):
+        final3 [i,j] = (MI3[i-1,j-1]*new3[0,0]) + (MI3[i-1,j]*new3[0,1]) + (MI3[i-1,j+1]*new3[0,2]) + (MI3[i,j-1]*new3[1,0]) + (MI3[i,j]*new3[1,1]) + (MI3[i,j+1]*new3[1,2]) + (MI3[i+1,j-1]*new3[2,0]) + (MI3[i+1,j]*new3[2,1]) + (MI3[i+1,j+1]*new3[2,2])
+
+print (final3)
+
+plt.figure("RUIDO GAUSSIANO")
+plt.subplot(121)
+plt.imshow(I,'gray')
+plt.title("IMAGEN CON RUIDO GAUSSIANO")
+plt.subplot(122)
+plt.imshow(final,'gray')
+plt.title("IMAGEN FILTRADA")
+
+plt.figure("RUIDO SAL Y PIMIENTA")
+plt.subplot(121)
+plt.imshow(I3,'gray')
+plt.title("IMAGEN CON RUIDO SAL Y PIMIENTA")
+plt.subplot(122)
+plt.imshow(final3,'gray')
+plt.title("IMAGEN FILTRADA")
+
+plt.figure("RUIDO MULTIPLICATIVO")
+plt.subplot(121)
+plt.imshow(I2,'gray')
+plt.title("IMAGEN CON MULTIPLICATIVO")
+plt.subplot(122)
+plt.imshow(final2,'gray')
+plt.title("IMAGEN FILTRADA")
+plt.show()
