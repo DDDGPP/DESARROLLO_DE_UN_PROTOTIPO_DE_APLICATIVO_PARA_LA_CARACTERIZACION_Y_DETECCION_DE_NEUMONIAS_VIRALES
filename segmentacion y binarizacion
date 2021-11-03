@@ -1,0 +1,342 @@
+import numpy as np
+import cv2
+import matplotlib.pyplot as plt
+import tkinter
+import tkinter as tk
+
+ventana=tkinter.Tk()#ventana principal
+ventana.title("SEGMENTACIÓN Y PSEUDOCOLOR")
+ventana.geometry("380x230")#ancho por alto
+ventana.configure(background='SkyBlue3')#color del fondo
+etiqueta1=tk.Label(ventana,text="SELECCIONE UNA OPCIÓN",bg="Azure2",fg="gray1")#color de la barra de escritura y color de letra
+etiqueta1.pack(fill=tk.X)
+
+def autolabeling():
+    I=cv2.imread('COVID-455.png',0)
+    print(I.dtype)
+    R=I[:,:]
+    G=I[:,:]
+    B=I[:,:]
+    D=I.shape
+    S=np.zeros((D[0],D[1]))
+    S=np.zeros((D[0],D[1]))
+    S=(I>200)&(I<255)
+    I1=I>120
+    C=np.uint8(S)
+    num_labels, labels_I=cv2.connectedComponents(C)
+    label=(labels_I>5)&(labels_I<128)
+    label=np.uint8(label)
+    
+    A=I1-label
+    H=(label)*(I)
+    I2=I-H
+    pcolor=np.zeros((D[0],D[1],3))
+    pcolor[:,:,0]=R-H
+    pcolor[:,:,1]=(G+H)
+    pcolor[:,:,2]=(B+H)
+        
+    plt.subplot(131)
+    plt.imshow(I,'gray')
+    plt.title("IMAGEN ORIGINAL")
+    plt.subplot(132),
+    plt.imshow(A*255,'gray')
+    plt.title("IMAGEN BINARIZADA")
+    plt.subplot(133)
+    plt.imshow(I2,'gray')
+    plt.title("IMAGEN SEGMENTADA ")
+    plt.show()
+        
+def dilatacion():
+    I=cv2.imread('COVID-455.png',0)
+    I1=cv2.imread('COVID-455.png',0)
+    s=cv2.imread('COVID-455.png',0)
+    s1=cv2.imread('COVID-455.png',0)
+    print(I.dtype)
+    C=I
+    R=C[:,:]
+    G=C[:,:]
+    B=C[:,:]
+    Gris= (R*0.299+G*0.587+B*0.114)
+
+    I=I>128;
+    s=s>128;
+    s1=s1>128;
+    D=I.shape
+    print(D)
+
+    for i in range(0,D[0]-1,1):
+        for j in range(1,D[1]-1,1):
+            if ((I[i,j]==0) & ((I[i-1,j-1]==1 )| (I[i-1,j+1]==1) | (I[i-1,j]==1))):
+                s[i,j]=1
+                s[i-1,j-1]=1
+                s[i-1,j+1]=1
+                
+    plt.subplot(131)
+    plt.imshow(C,'gray')
+    plt.title("IMAGEN ORIGINAL")
+    plt.subplot(132),
+    plt.imshow(I*255,'gray')
+    plt.title("IMAGEN BINARIZADA")
+    plt.subplot(133)
+    plt.imshow(s*255,'gray')
+    plt.title("IMAGEN DILATADA")
+    plt.show()
+
+def erosion():
+    I=cv2.imread('COVID-455.png',0)
+    I1=cv2.imread('COVID-455.png',0)
+    s=cv2.imread('COVID-455.png',0)
+    s1=cv2.imread('COVID-455.png',0)
+    print(I.dtype)
+    C=I
+    R=C[:,:]
+    G=C[:,:]
+    B=C[:,:]
+    Gris= (R*0.299+G*0.587+B*0.114)
+
+    I=I>128;
+    s=s>128;
+    s1=s1>128;
+    D=I.shape
+    print(D)
+
+    for i in range(0,D[0]-1,1):
+        for j in range(1,D[1]-1,1):
+            if ((I[i,j]==1) & ((I[i-1,j-1]==0 )| (I[i-1,j+1]==0) | (I[i-1,j]==0))):
+                s1[i,j]=0
+                s1[i-1,j-1]=0
+                s1[i-1,j+1]=0
+          
+    plt.subplot(131)
+    plt.imshow(C,'gray')
+    plt.title("IMAGEN ORIGINAL")
+    plt.subplot(132),
+    plt.imshow(I*255,'gray')
+    plt.title("IMAGEN BINARIZADA")
+    plt.subplot(133)
+    plt.imshow(s1*255,'gray')
+    plt.title("IMAGEN EROSIONADA")
+    plt.show()
+
+def abrir():
+    I=cv2.imread('COVID-455.png',0)
+    I1=cv2.imread('COVID-455.png',0)
+    s=cv2.imread('COVID-455.png',0)
+    s1=cv2.imread('COVID-455.png',0)
+    print(I.dtype)
+    C=I
+    R=C[:,:]
+    G=C[:,:]
+    B=C[:,:]
+    Gris= (R*0.299+G*0.587+B*0.114)
+
+    I=I>128;
+    s=s>128;
+    s1=s1>128;
+    op=op>128;
+    D=I.shape
+    print(D)
+
+    for i in range(0,D[0]-1,1):
+        for j in range(1,D[1]-1,1):
+            if ((I[i,j]==1) & ((I[i-1,j-1]==0 )| (I[i-1,j+1]==0) | (I[i-1,j]==0))):
+                s1[i,j]=0
+                s1[i-1,j-1]=0
+                s1[i-1,j+1]=0
+                
+    for i in range(0,D[0]-1,1):
+        for j in range(1,D[1]-1,1):
+            if ((s1[i,j]==0) & ((s1[i-1,j-1]==1 )| (s1[i-1,j+1]==1) | (s1[i-1,j]==1))):
+                op[i,j]=1
+                op[i-1,j-1]=1
+                op[i-1,j+1]=1
+     
+    plt.subplot(131)
+    plt.imshow(C,'gray')
+    plt.title("IMAGEN ORIGINAL")
+    plt.subplot(132),
+    plt.imshow(I*255,'gray')
+    plt.title("IMAGEN binarizada")
+    plt.subplot(133)
+    plt.imshow(op*255,'gray')
+    plt.title("IMAGEN ABIERTA")
+    plt.show()
+
+def cierre():
+    I=cv2.imread('COVID-455.png',0)
+    I1=cv2.imread('COVID-455.png',0)
+    s=cv2.imread('COVID-455.png',0)
+    s1=cv2.imread('COVID-455.png',0)
+    print(I.dtype)
+    C=I
+    R=C[:,:]
+    G=C[:,:]
+    B=C[:,:]
+    Gris= (R*0.299+G*0.587+B*0.114)
+
+    I=I>128;
+    s=s>128;
+    s1=s1>128;
+    CE=CE>128;
+    D=I.shape
+    print(D)
+
+    for i in range(0,D[0]-1,1):
+        for j in range(1,D[1]-1,1):
+            if ((I[i,j]==0) & ((I[i-1,j-1]==1 )| (I[i-1,j+1]==1) | (I[i-1,j]==1))):
+                s[i,j]=1
+                s[i-1,j-1]=1
+                s[i-1,j+1]=1
+                
+    for i in range(0,D[0]-1,1):
+        for j in range(1,D[1]-1,1):
+            if ((s[i,j]==1) & ((s[i-1,j-1]==0 )| (s[i-1,j+1]==0) | (s[i-1,j]==0))):
+                CE[i,j]=0
+                CE[i-1,j-1]=0
+                CE[i-1,j+1]=0
+             
+    plt.subplot(131)
+    plt.imshow(C,'gray')
+    plt.title("IMAGEN ORIGINAL")
+    plt.subplot(132),
+    plt.imshow(I*255,'gray')
+    plt.title("IMAGEN binarizada")
+    plt.subplot(133)
+    plt.imshow(CE*255,'gray')
+    plt.title("IMAGEN CERRADA")
+    plt.show()
+    
+def envolvente():
+    I=cv2.imread('COVID-455.png',0)
+    I1=cv2.imread('COVID-455.png',0)
+    s=cv2.imread('COVID-455.png',0)
+    s1=cv2.imread('COVID-455.png',0)
+    print(I.dtype)
+    C=I
+    R=C[:,:]
+    G=C[:,:]
+    B=C[:,:]
+    Gris= (R*0.299+G*0.587+B*0.114)
+
+    I=I>128;
+    s=s>128;
+    s1=s1>128;
+    D=I.shape
+    print(D)
+
+    for i in range(0,D[0]-1,1):
+        for j in range(1,D[1]-1,1):
+            if ((I[i,j]==0) & ((I[i-1,j-1]==1 )| (I[i-1,j+1]==1) | (I[i-1,j]==1))):
+                s[i,j]=1
+                s[i-1,j-1]=1
+                s[i-1,j+1]=1
+                
+    for i in range(0,D[0]-1,1):
+        for j in range(1,D[1]-1,1):
+            if ((I[i,j]==1) & ((I[i-1,j-1]==0 )| (I[i-1,j+1]==0) | (I[i-1,j]==0))):
+                s1[i,j]=0
+                s1[i-1,j-1]=0
+                s1[i-1,j+1]=0
+
+    s1=1-s1
+    L=(I*s1)
+    plt.subplot(121)
+    plt.imshow(C,'gray')
+    plt.title("IMAGEN ORIGINAL")
+    plt.subplot(122)
+    plt.imshow(L*255,'gray')
+    plt.title("IMAGEN ENVOLVENTE")
+    plt.show()
+
+def segmentacion():
+    I=cv2.imread('COVID-455.png',0)
+    print(I.dtype)
+
+    R=I[:,:]
+    G=I[:,:]
+    B=I[:,:]
+    D=I.shape
+
+    S=np.zeros((D[0],D[1]))
+    S=(I>200)&(I<255)
+    I1=I>120
+
+    C=np.uint8(S)
+    num_labels, labels_I=cv2.connectedComponents(C)
+    label=(labels_I>5)&(labels_I<128)
+    label=np.uint8(label)
+    A=I1-label
+    H=(label)*(I)
+    I2=I-H
+    pcolor=np.zeros((D[0],D[1],3))
+    pcolor[:,:,0]=R-H
+    pcolor[:,:,1]=(G+H)
+    pcolor[:,:,2]=(B+H)
+    
+    #SEGMENTACIÓN
+    plt.subplot(131)
+    plt.imshow(I,'gray')
+    plt.title("IMAGEN ORIGINAL")
+    plt.subplot(132),
+    plt.imshow(A*255,'gray')
+    plt.title("IMAGEN BINARIZADA")
+    plt.subplot(133)
+    plt.imshow(I2,'gray')
+    plt.title("IMAGEN SEGMENTADA ")
+    plt.show()
+        
+def pseudocolor():
+    I=cv2.imread('COVID-455.png',0)
+    print(I.dtype)
+
+    R=I[:,:]
+    G=I[:,:]
+    B=I[:,:]
+    D=I.shape
+
+    S=np.zeros((D[0],D[1]))
+    S=(I>200)&(I<255)
+    I1=I>120
+
+    C=np.uint8(S)
+    num_labels, labels_I=cv2.connectedComponents(C)
+    label=(labels_I>5)&(labels_I<128)
+    label=np.uint8(label)
+    A=I1-label
+    H=(label)*(I)
+    I2=I-H
+    pcolor=np.zeros((D[0],D[1],3))
+    pcolor[:,:,0]=R-H
+    pcolor[:,:,1]=(G+H)
+    pcolor[:,:,2]=(B+H)
+
+#PSEUDOCOLOR
+    plt.subplot(131)
+    plt.imshow(I,'gray')
+    plt.title("IMAGEN ORIGINAL")
+    plt.subplot(132),
+    plt.imshow(I2,'gray')
+    plt.title("IMAGEN SEGMENTADA")
+    plt.subplot(133)
+    plt.imshow(np.uint8(pcolor),'gray')
+    plt.title("IMAGEN PSEUDOCOLOR ")
+    plt.show()
+
+#botones en el menu
+boton1=tkinter.Button(ventana, text="AUTOLABELING", command = autolabeling)
+boton1.pack()
+boton2=tkinter.Button(ventana, text=" DILATACIÓN ", command = dilatacion)
+boton2.pack()
+boton3=tkinter.Button(ventana, text="  EROSIÓN   ", command = erosion)
+boton3.pack()
+boton4=tkinter.Button(ventana, text="   ABRIR    ", command = abrir)
+boton4.pack()
+boton5=tkinter.Button(ventana, text="   CIERRE   ", command = cierre)
+boton5.pack()
+boton6=tkinter.Button(ventana, text=" ENVOLVENTE ", command = envolvente)
+boton6.pack()
+boton7=tkinter.Button(ventana, text="SEGMENTACIÓN", command = segmentacion)
+boton7.pack()
+boton8=tkinter.Button(ventana, text="PSEUDOCOLOR ", command = pseudocolor)
+boton8.pack()
+ventana.mainloop()
