@@ -1,0 +1,162 @@
+import numpy as np
+import cv2
+import matplotlib.pyplot as plt
+import tkinter
+import tkinter as tk
+
+ventana=tkinter.Tk()#ventana principal
+ventana.title("BINARIZACIÓN")
+ventana.geometry("400x300")#ancho por alto
+ventana.configure(background='indianred1')
+etiqueta1=tk.Label(ventana,text="BINARIZACIÓN",bg="gold",fg="white")
+etiqueta1.pack(fill=tk.X)
+
+def otsu():
+    import numpy as np
+    import cv2
+    import matplotlib.pyplot as plt
+    import math
+
+    I=cv2.imread('cerebrorx.jpg.',0)
+    rows, cols= I.shape
+    hist=cv2.calcHist([I],[0],None,[256],[0,256])
+    PDF= hist/(rows*cols)
+    C=np.zeros((256))
+    t=254
+    Umbral=0
+
+    for t in range(1,t+1):
+        W0=0
+        W1=0
+        U0=0
+        U1=0
+        for i in range(0,t+1):
+            W0=W0+PDF[i]
+            U0=U0+(PDF[i]*(i+1))
+            
+        U0=U0/W0
+        
+        for i in range(t+1,256):
+            W1=W1+PDF[i]
+            U1=U1+(PDF[i]*(i+1))
+        U1=U1/W1
+        UT=(U0*W0)+(U1*W1)
+        Var=(W0*((U0-UT)**2))+(W1*((U1-UT)**2))
+        C[t]=Var
+
+    Varmax=np.max(C)
+    print(Varmax)
+    for i in range(0,256):
+        if (Varmax==C[i]):
+            Umbral=i
+        else:
+            Umbral=Umbral
+
+    I1=np.zeros(((rows,cols)))
+                
+    for i in range(0,rows):
+        for j in range(0,cols):
+            I1[i,j]=I[i,j]
+            if(I1[i,j]>=Umbral):
+                I1[i,j]=255
+            else:
+                I1[i,j]=0
+    
+    print(Umbral)    
+    I1=np.uint8(I1)
+    plt.subplot(131)
+    plt.imshow(I,'gray')
+    plt.title("IMAGEN ORIGINAL")
+    plt.subplot(132)
+    plt.imshow(I1,'gray')
+    plt.title("IMAGEN OTSU")
+    plt.subplot(133)
+    plt.stem(hist)#.plot
+    plt.title("HISTOGRAMA")
+    plt.show()
+  
+def picos():
+    I=cv2.imread('cerebrorx.jpg',0)
+
+    hist=np.bincount(I.ravel(),minlength=256)
+
+    P1=np.max(hist)
+    P2=hist[hist<P1].max()
+    pp1=0;
+    pp2=0;
+    #q=0
+    for i in range(0,len(hist),1):
+        if (P1==hist[i]):
+            pp1=i
+        if (P2==hist[i]):
+            pp2=i
+    A=hist[pp1:pp2]
+
+    for i in range(0,len(hist),1):
+        if ((np.min(A))==hist[i]):
+            q=i
+    Z=I>q
+    #hist2=cv2.calcHist([Z],[0],None,[256],[0,256])
+    plt.subplot(131)
+    plt.imshow(I,'gray')
+    plt.title("IMAGEN ORIGINAL")
+    plt.subplot(132)
+    plt.imshow(Z,'gray')
+    plt.title("IMAGEN BINARIZADA 2 PICOS")
+    plt.subplot(133)
+    plt.stem(hist)#.plot
+    plt.title("HISTOGRAMA")
+    plt.show()
+    plt.stem(hist2)#.plot
+   
+def watershed():
+    I=cv2.imread('cerebrorx.jpg',0)
+    I1=cv2.imread('cerebrorx.jpg',0)
+    s=cv2.imread('cerebrorx.jpg',0)
+    s1=cv2.imread('cerebrorx.jpg',0)
+    print(I.dtype)
+    C=I
+    R=C[:,:]
+    G=C[:,:]
+    B=C[:,:]
+    Gris= (R*0.299+G*0.587+B*0.114)
+    I=I>128;
+    s=s>128;
+    s1=s1>128;
+    D=I.shape
+    print(D)
+
+    for i in range(0,D[0]-1,1):
+        for j in range(1,D[1]-1,1):
+            if ((I[i,j]==0) & ((I[i-1,j-1]==1 )| (I[i-1,j+1]==1) | (I[i+1,j]==1))):
+                s[i,j]=1
+                s[i-1,j-1]=1
+                s[i-1,j+1]=1
+            
+    for i in range(0,D[0]-1,1):
+        for j in range(1,D[1]-1,1):
+            if ((I[i,j]==1) & ((I[i-1,j-1]==0 )| (I[i-1,j+1]==0) | (I[i+1,j]==0))):
+                s1[i,j]=0
+                s1[i-1,j-1]=0
+                s1[i-1,j+1]=0
+
+    s1=1-s1#se le resta 1 a la imagen de salida del for
+    L=(I*s1)
+    W=L*Gris
+    plt.subplot(121)
+    plt.imshow(C,'gray')
+    plt.title("IMAGEN ORIGINAL")
+    plt.subplot(122)
+    plt.imshow(W,'gray')
+    plt.title("IMAGEN WATERSHED")
+    
+    plt.show()
+        
+boton1=tkinter.Button(ventana, text="OTSU", command = otsu)
+boton1.pack()
+boton2=tkinter.Button(ventana, text="2 PICOS", command = picos)
+boton2.pack()
+boton3=tkinter.Button(ventana, text="WATERSHED", command = watershed)
+boton3.pack()
+
+ventana.mainloop()
