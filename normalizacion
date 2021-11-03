@@ -1,0 +1,51 @@
+import numpy as np
+import cv2
+import matplotlib.pyplot as plt
+
+#normalizacion: mismas caractersticas pero en un rango de valores específicos
+I=cv2.imread('COVID-13.png')
+print(I.dtype)
+R=I[:,:,0]
+G=I[:,:,1]
+B=I[:,:,2]
+Gris= (R*0.299+G*0.587+B*0.114)
+I2=Gris
+[F,C]=I2.shape
+T=F*C
+mar=np.asarray(I2,dtype=np.float32)#se saca el arreglo de la imagen en escala de grises en tipo 32
+mar=mar.reshape(1,T)#para volver a ponerlo como matriz
+mar=mar.astype(int)#cambiar el tipo de dato a entero
+mar=max(mar)#maximo valor
+valor=0
+maxd=max(mar)
+gss=maxd#para sacar el máximon de grises de la imagen
+vec=np.zeros(gss+1)
+sumatoria=float(0)#para el contador
+
+#NORMALIZACIÓN DE 0 A 1
+minI=I.min()
+pos_I=I-minI#se le resta el valor mínimo a la señal
+maxI=I.max()#valor máximo de la señal positiva
+media=I.mean()
+neg_I=I-media
+Norm_I=pos_I/maxI-minI#señal normalizada entre 0 y 1
+
+for i in range(len(I2)):#contador
+    for j in range(len(I2[i])):
+        sumatoria=sumatoria+I2[i][j]
+PROI2=sumatoria/T
+#DESVIACIÓN
+for i in range(0,255,1):
+    var=(vec[i]-PROI2)**2
+DES=var**(1/2)
+Norm_I2=neg_I/DES
+plt.subplot(131)
+plt.imshow(I2,'gray')
+plt.title("IMAGEN ORIGINAL")
+plt.subplot(132)
+plt.imshow(Norm_I)
+plt.title("IMAGEN NORMALIZADA 0 Y 1")
+plt.subplot(133)
+plt.imshow(Norm_I2)
+plt.title("IMAGEN NORMALIZADA -1 Y 1")
+plt.show()
